@@ -19,6 +19,7 @@
 
 # Module label 'ModuleMrpBdePickingName'
 ModuleMrpBdePickingName = MrpBdePicking
+PickingList = Picking List
 # Module description 'ModuleMrpBdePickingDesc'
 ModuleMrpBdePickingDesc = MrpBdePicking description
 
@@ -42,10 +43,10 @@ MrpBdePickingAbout = About MrpBdePicking
 MrpBdePickingAboutPage = MrpBdePicking about page
 
 #
-# Sample page
+# moPicking_list.php
 #
-MrpBdePickingArea = Home MrpBdePicking
-MyPageName = My page name
+ListOfManufacturingOrdersWithConsumableProducts = Picking list for products on stock
+
 
 #
 # Sample widget

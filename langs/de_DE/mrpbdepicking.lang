@@ -18,9 +18,10 @@
 #
 
 # Module label 'ModuleMrpBdePickingName'
-ModuleMrpBdePickingName = MrpBdePicking
+ModuleMrpBdePickingName = Kommissionieren
+PickingList = Kommissionierliste
 # Module description 'ModuleMrpBdePickingDesc'
-ModuleMrpBdePickingDesc = MrpBdePicking description
+ModuleMrpBdePickingDesc = Stellt eine Kommissionierliste der laufenden Fertigungsaufträge bereit.
 
 #
 # Admin page
@@ -42,7 +43,7 @@ MrpBdePickingAbout = About MrpBdePicking
 MrpBdePickingAboutPage = MrpBdePicking about page
 
 #
-# mrpbdepickingindex.php
+# moPicking_list.php
 #
 ListOfManufacturingOrdersWithConsumableProducts = Kommissionierliste für lagerhaltige Produkte
 ProductToConsume = Benötigtes Produkt

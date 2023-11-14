@@ -52,7 +52,7 @@ class modMrpBdePicking extends DolibarrModules
 
 		// Family can be 'base' (core modules),'crm','financial','hr','projects','products','ecm','technic' (transverse modules),'interface' (link with external tools),'other','...'
 		// It is used to group modules by family in module setup page
-		$this->family = "other";
+		$this->family = "products";
 
 		// Module position in the family on 2 digits ('01', '10', '20', ...)
 		$this->module_position = '90';
@@ -83,7 +83,7 @@ class modMrpBdePicking extends DolibarrModules
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
 		// To use a supported fa-xxx css style of font awesome, use this->picto='xxx'
-		$this->picto = 'fa-file-o';
+		$this->picto = 'mrp';
 
 		// Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
 		$this->module_parts = array(
@@ -136,7 +136,7 @@ class modMrpBdePicking extends DolibarrModules
 		// A condition to hide module
 		$this->hidden = false;
 		// List of module class names that must be enabled if this module is enabled. Example: array('always'=>array('modModuleToEnable1','modModuleToEnable2'), 'FR'=>array('modModuleToEnableFR')...)
-		$this->depends = array();
+		$this->depends = array("mrp");
 		// List of module class names to disable if this one is disabled. Example: array('modModuleToDisable1', ...)
 		$this->requiredby = array();
 		// List of module class names this module is in conflict with. Example: array('modModuleToDisable1', ...)
@@ -295,7 +295,7 @@ class modMrpBdePicking extends DolibarrModules
 		$this->menu = array();
 		$r = 0;
 		// Add here entries to declare new menus
-		/* BEGIN MODULEBUILDER TOPMENU */
+		/* BEGIN MODULEBUILDER TOPMENU
 		$this->menu[$r++] = array(
 			'fk_menu'=>'', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'top', // This is a Top menu entry
@@ -311,25 +311,25 @@ class modMrpBdePicking extends DolibarrModules
 			'target'=>'',
 			'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
 		);
-		/* END MODULEBUILDER TOPMENU */
+		END MODULEBUILDER TOPMENU */
 		/* BEGIN MODULEBUILDER LEFTMENU MYOBJECT */
-		/*$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=mrpbdepicking',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=mrp',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',                          // This is a Left menu entry
-			'titre'=>'MyObject',
+			'titre'=>'PickingList',
 			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
-			'mainmenu'=>'mrpbdepicking',
-			'leftmenu'=>'myobject',
-			'url'=>'/mrpbdepicking/mrpbdepickingindex.php',
+			'mainmenu'=>'mrp',
+			'leftmenu'=>'',
+			'url'=>'/mrpbdepicking/moPicking_list.php',
 			'langs'=>'mrpbdepicking@mrpbdepicking',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000+$r,
-			'enabled'=>'isModEnabled("mrpbdepicking")', // Define condition to show or hide menu entry. Use 'isModEnabled("mrpbdepicking")' if entry must be visible if module is enabled.
-			'perms'=>'$user->hasRight("mrpbdepicking", "myobject", "read")',
+			'enabled'=> 'isModEnabled("mrpbdepicking")', // Define condition to show or hide menu entry. Use 'isModEnabled("mrpbdepicking")' if entry must be visible if module is enabled.
+			'perms'=>'$user->hasRight("mrp", "read")',
 			'target'=>'',
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=mrpbdepicking,fk_leftmenu=myobject',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+		/*$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=mrp,fk_leftmenu=mo',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
 			'titre'=>'List_MyObject',
 			'mainmenu'=>'mrpbdepicking',
@@ -338,7 +338,7 @@ class modMrpBdePicking extends DolibarrModules
 			'langs'=>'mrpbdepicking@mrpbdepicking',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000+$r,
 			'enabled'=>'isModEnabled("mrpbdepicking")', // Define condition to show or hide menu entry. Use 'isModEnabled("mrpbdepicking")' if entry must be visible if module is enabled.
-			'perms'=>'$user->hasRight("mrpbdepicking", "myobject", "read")'
+			'perms'=>'$user->hasRight("mrpbdepicking", "myobject", "read")',
 			'target'=>'',
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);

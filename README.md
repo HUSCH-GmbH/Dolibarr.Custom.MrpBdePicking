@@ -2,11 +2,15 @@
 
 ## Features
 
-Test
+### Picking list
+The picking list is displayed under *MRP => Picking list*.
 
-<!--
-![Screenshot mrpbdepicking](img/screenshot_mrpbdepicking.png?raw=true "MrpBdePicking"){imgmd}
--->
+![Screenshot mrpbdepicking](img/screenshot_mrpbdepicking.png?raw=true)
+
+### API / WEB Service
+The picking list is accessible over *GET /mrpbdepicking/mopickinglines*
+
+![Screenshot mrpbdepicking](img/screenshot_mrpbdepicking_api.png?raw=true)
 
 Other external modules are available on [Dolistore.com](https://www.dolistore.com).
 

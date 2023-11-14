@@ -18,22 +18,20 @@
  */
 
 /**
- * \file        class/molineconsumable.class.php
- * \ingroup     mrp
- * \brief       This file is a CRUD class file for MoLineConsumable (Create/Read/Update/Delete)
+ * \file        class/mopickingline.class.php
+ * \ingroup     mrpbdepicking
+ * \brief       This file is a CRUD class file for MoPickingLine (Create/Read/Update/Delete)
  */
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobjectline.class.php';
-require_once DOL_DOCUMENT_ROOT . '/mrp/class/mo.class.php';
-//require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-//require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+require_once DOL_DOCUMENT_ROOT.'/mrp/class/mo.class.php';
 
 /**
- * Class for MoLineConsumable
+ * Class for MoPickingLine
  */
-class MoLineConsumable extends CommonObject
+class MoPickingLine extends CommonObject
 {
 	/**
 	 * @var string ID to identify managed object

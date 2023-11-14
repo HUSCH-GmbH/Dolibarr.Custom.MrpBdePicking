@@ -1,8 +1,6 @@
 <?php
-/* Copyright (C) 2001-2005 Rodolphe Quiedeville <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2015 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2005-2012 Regis Houssin        <regis.houssin@inodbox.com>
- * Copyright (C) 2015      Jean-François Ferry	<jfefe@aternatik.fr>
+/* Copyright (C) 2023   	Christian Humpel     <christian.humpel@gmail.com>
+ * Copyright (C) 2004-2015 	Laurent Destailleur  <eldy@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +17,9 @@
  */
 
 /**
- *	\file       mrpbdepicking/mrpbdepickingindex.php
+ *	\file       mrpbdepicking/moPicking_list.php.php
  *	\ingroup    mrpbdepicking
- *	\brief      Home page of mrpbdepicking top menu
+ *	\brief      Home page of mrpbdepicking MO => Picking list
  */
 
 // Load Dolibarr environment
@@ -64,10 +62,10 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
 
 // load mrp libraries
-require_once __DIR__.'/class/molineconsumable.class.php';
+require_once __DIR__ . '/class/mopickingline.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("mrpbdepicking@mrpbdepicking"));
+$langs->loadLangs(array("mrpbdepicking@mrpbdepicking","mrp", "other"));
 
 $action     = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...
 $massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
@@ -97,10 +95,10 @@ $pagenext = $page + 1;
 //if (! $sortorder) $sortorder="DESC";
 
 // Initialize technical objects
-$object = new MoLineConsumable($db);
+$object = new MoPickingLine($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->mrp->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('molistassignable')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('mopickinglist')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
