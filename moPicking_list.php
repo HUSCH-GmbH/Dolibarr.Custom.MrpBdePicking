@@ -717,7 +717,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'ref') {
 				$qty = min($object->warehousereel, $obj->qtytoconsum);
 				$option = 'consume,lineid='.$object->molinerowid.',warehouseid='.$object->warehouserowid.',qty='.$qty;
-				$url = $tmpMoObj->getNomUrl(1, $option);
+				$url = $object->getNomUrlForMo($tmpMoObj, 1, $option);
 				print $url;
 			} elseif ($key == 'fk_parent_line') {
 				$moparent = $object->getMoParent();

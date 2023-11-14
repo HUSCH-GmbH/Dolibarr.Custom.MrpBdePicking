@@ -26,9 +26,9 @@ ModuleMrpBdePickingDesc = Stellt eine Kommissionierliste der laufenden Fertigung
 #
 # Admin page
 #
-MrpBdePickingSetup = MrpBdePicking setup
-Settings = Settings
-MrpBdePickingSetupPage = MrpBdePicking setup page
+MrpBdePickingSetup = Einstellungen Modul Kommissionieren
+Settings = Allgemein
+MrpBdePickingSetupPage = Grundeinstellungen
 MRPBDEPICKING_MYPARAM1 = Mein Parameter 1
 MRPBDEPICKING_MYPARAM1Tooltip = My param 1 tooltip
 MRPBDEPICKING_MYPARAM2=My param 2

@@ -96,7 +96,7 @@ if (!class_exists('FormSetup')) {
 
 $formSetup = new FormSetup($db);
 
-
+/*
 // HTTP HOST
 $item = $formSetup->newItem('NO_PARAM_JUST_TEXT');
 $item->fieldOverride = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'];
@@ -159,9 +159,9 @@ $item->helpText = $langs->transnoentities('AnHelpMessage');
 //$item->fieldInputOverride = false; // set this var to override field input
 //$item->fieldOutputOverride = false; // set this var to override field output
 
+*/
 
 $setupnotempty += count($formSetup->items);
-
 
 $dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
 
@@ -575,9 +575,9 @@ foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 	}
 }
 
-if (empty($setupnotempty)) {
-	print '<br>'.$langs->trans("NothingToSetup");
-}
+//if (empty($setupnotempty)) {
+//	print '<br>'.$langs->trans("NothingToSetup");
+//}
 
 // Page end
 print dol_get_fiche_end();
