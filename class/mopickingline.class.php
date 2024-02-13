@@ -162,6 +162,7 @@ class MoPickingLine extends CommonObject
 
 		// Extends the $fields list
 		$extendFields = array(
+			'fk_product_ref' => array('sqlSelect'=>'p.ref AS fk_product_ref', 'label'=>'TargetProductRef', 'enabled'=>1, 'visible'=>-2, 'checked'=>0, 'position'=>1),
 			'consumableproductrowid' => array('sqlSelect'=>'p.rowid AS consumableproductrowid', 'label'=>'ProductToConsumeTechnicalID', 'enabled'=>1, 'visible'=>-2, 'checked'=>0, 'position'=>1),
 			'consumbaleproductref' => array('sqlSelect'=>'p.ref AS consumbaleproductref','label'=>'ProductToConsume', 'enabled'=>(!isModEnabled('product') ? 0 : 1), 'checked'=>1, 'position'=>35, 'visible'=>1),
 			'qtytoconsum' => array('sqlSelect'=>'(l.qty - IFNULL(tChild.qty_consumed, 0)) AS qtytoconsum','label'=>'QtyToConsum', 'enabled'=>1, 'checked'=>1, 'position'=>42, 'type'=>'real', 'visible'=>1, 'css'=>'width75'),
