@@ -122,12 +122,13 @@ class MrpBdePicking extends DolibarrApi
 		$sql = 'SELECT t.rowid,t.entity,';
 		$sql .= implode(',', $selects);
 		$sql .= " FROM " . MAIN_DB_PREFIX . "product_stock as s";
-		$sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON s.fk_product = p.rowid";
+		$sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON s.fk_product = p.rowid"; // Consum Product Join
 		$sql .= " INNER JOIN " . MAIN_DB_PREFIX . "mrp_production as l ON p.rowid = l.fk_product";
 		$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . " as t ON l.fk_mo = t.rowid";
 		if (isset($extrafields->attributes[$tmpobject->table_element]['label']) && is_array($extrafields->attributes[$tmpobject->table_element]['label']) && count($extrafields->attributes[$tmpobject->table_element]['label'])) {
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 		}
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product AS tp ON t.fk_product = tp.rowid"; // Target Product Join
 
 		$sqlConsumed = "SELECT fk_mrp_production, SUM(qty) AS qty_consumed";
 		$sqlConsumed .= " FROM " . MAIN_DB_PREFIX . "mrp_production";
