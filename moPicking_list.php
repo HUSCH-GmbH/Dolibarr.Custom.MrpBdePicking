@@ -139,7 +139,7 @@ foreach ($object->fields as $key => $val) {
 	if (GETPOST('search_'.$key, 'alpha') !== '') {
 		$search[$key] = GETPOST('search_'.$key, 'alpha');
 	}
-	if (preg_match('/^(date|timestamp|datetime)/', $val['type'])) {
+	if (!empty($val['type']) && preg_match('/^(date|timestamp|datetime)/', $val['type'])) {
 		$search[$key.'_dtstart'] = dol_mktime(0, 0, 0, GETPOST('search_'.$key.'_dtstartmonth', 'int'), GETPOST('search_'.$key.'_dtstartday', 'int'), GETPOST('search_'.$key.'_dtstartyear', 'int'));
 		$search[$key.'_dtend'] = dol_mktime(23, 59, 59, GETPOST('search_'.$key.'_dtendmonth', 'int'), GETPOST('search_'.$key.'_dtendday', 'int'), GETPOST('search_'.$key.'_dtendyear', 'int'));
 	}
@@ -279,6 +279,8 @@ $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element." as t ON l.fk_mo = 
 if (isset($extrafields->attributes[$object->table_element]['label']) && is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) {
 	$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 }
+
+$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product AS tp ON t.fk_product = tp.rowid"; // Target Product Join
 
 $sqlConsumed = "SELECT fk_mrp_production, SUM(qty) AS qty_consumed";
 $sqlConsumed .= " FROM ".MAIN_DB_PREFIX."mrp_production";

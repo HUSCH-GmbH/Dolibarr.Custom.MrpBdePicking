@@ -162,12 +162,13 @@ class MoPickingLine extends CommonObject
 
 		// Extends the $fields list
 		$extendFields = array(
-			'consumableproductrowid' => array('sqlSelect'=>'p.rowid AS consumableproductrowid', 'label'=>'ProductToConsumeTechnicalID', 'enabled'=>1, 'visible'=>-2, 'checked'=>0, 'position'=>1),
-			'consumbaleproductref' => array('sqlSelect'=>'p.ref AS consumbaleproductref','label'=>'ProductToConsume', 'enabled'=>(!isModEnabled('product') ? 0 : 1), 'checked'=>1, 'position'=>35, 'visible'=>1),
-			'qtytoconsum' => array('sqlSelect'=>'(l.qty - IFNULL(tChild.qty_consumed, 0)) AS qtytoconsum','label'=>'QtyToConsum', 'enabled'=>1, 'checked'=>1, 'position'=>42, 'type'=>'real', 'visible'=>1, 'css'=>'width75'),
-			'warehousereel' => array('sqlSelect'=>'s.reel AS warehousereel','label'=>'QtyInWarehouse', 'enabled'=>1, 'checked'=>1, 'position'=>43, 'type'=>'real', 'visible'=>1, 'css'=>'width75'),
-			'warehousetoconsume' => array('sqlSelect'=>'s.fk_entrepot AS warehousetoconsume','label'=>'WarehouseToConsume', 'enabled'=>'$conf->stock->enabled', 'checked'=>1, 'position'=>44, 'type'=>'integer:Entrepot:product/stock/class/entrepot.class.php:0','picto'=>'stock', 'visible'=>1, 'css'=>'maxwidth400', 'csslist'=>'tdoverflowmax200'),
-			'molinerowid' => array('sqlSelect'=>'l.rowid AS molinerowid','label'=>'molinerowid', 'enabled'=>1, 'checked'=>0, 'position'=>1, 'visible'=>-2),
+			'fk_product_ref' => array('sqlSelect'=>'tp.ref AS fk_product_ref', 'type'=>'varchar(128)', 'label'=>'TargetProductRef', 'enabled'=>1, 'visible'=>-2, 'checked'=>0, 'position'=>1),
+			'consumableproductrowid' => array('sqlSelect'=>'p.rowid AS consumableproductrowid', 'type'=>'integer', 'label'=>'ProductToConsumeTechnicalID', 'enabled'=>1, 'visible'=>-2, 'checked'=>0, 'position'=>1),
+			'consumbaleproductref' => array('sqlSelect'=>'p.ref AS consumbaleproductref', 'type'=>'varchar(128)','label'=>'ProductToConsume', 'enabled'=>(!isModEnabled('product') ? 0 : 1), 'checked'=>1, 'position'=>35, 'visible'=>1),
+			'qtytoconsum' => array('sqlSelect'=>'(l.qty - IFNULL(tChild.qty_consumed, 0)) AS qtytoconsum', 'type'=>'real','label'=>'QtyToConsum', 'enabled'=>1, 'checked'=>1, 'position'=>42, 'visible'=>1, 'css'=>'width75'),
+			'warehousereel' => array('sqlSelect'=>'s.reel AS warehousereel', 'type'=>'real','label'=>'QtyInWarehouse', 'enabled'=>1, 'checked'=>1, 'position'=>43, 'visible'=>1, 'css'=>'width75'),
+			'warehousetoconsume' => array('sqlSelect'=>'s.fk_entrepot AS warehousetoconsume', 'type'=>'integer:Entrepot:product/stock/class/entrepot.class.php:0','label'=>'WarehouseToConsume', 'enabled'=>'$conf->stock->enabled', 'checked'=>1, 'position'=>44,'picto'=>'stock', 'visible'=>1, 'css'=>'maxwidth400', 'csslist'=>'tdoverflowmax200'),
+			'molinerowid' => array('sqlSelect'=>'l.rowid AS molinerowid', 'type'=>'integer','label'=>'molinerowid', 'enabled'=>1, 'checked'=>0, 'position'=>1, 'visible'=>-2),
 		);
 		$this->fields = array_merge($this->fields, $extendFields);
 
@@ -208,6 +209,19 @@ class MoPickingLine extends CommonObject
 	 */
 	public function getNomUrlForMo($mo, $withpicto = 0, $option = '', $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
 	{
+        global $conf, $langs, $hookmanager;
+
+        if (!empty($conf->dol_no_mouse_hover)) {
+            $notooltip = 1; // Force disable tooltips
+        }
+
+        $params = [
+            'id' => $mo->id,
+            'objecttype' => $mo->element,
+            'option' => $option,
+            'nofetch' => 1,
+        ];
+
 		//Default URL from MO class
 		$result = $mo->getNomUrl($withpicto, $option, $notooltip, $morecss, $save_lastsearch_value);
 
@@ -218,8 +232,9 @@ class MoPickingLine extends CommonObject
 			$arrTmp = explode(',', $option);
 			$optionArr=[];
 			foreach ($arrTmp as $optTmp) {
-				$key = explode('=', $optTmp)[0];
-				$val = explode('=', $optTmp)[1];
+                $explodeOptionStr = explode('=', $optTmp);
+                $key = $explodeOptionStr[0];
+				$val = count($explodeOptionStr) > 1 ? $explodeOptionStr[1] : null;
 				$optionArr[$key] = $val;
 			}
 			if (!empty($optionArr['lineid']) && !empty($optionArr['qty'])) {
@@ -240,17 +255,27 @@ class MoPickingLine extends CommonObject
 				}
 			}
 
-			$linkclose = '';
-			if (empty($notooltip)) {
-				if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-					$label = $langs->trans("ShowMo");
-					$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
-				}
-				$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
-				$linkclose .= ' class="classfortooltip'.($morecss ? ' '.$morecss : '').'"';
-			} else {
-				$linkclose = ($morecss ? ' class="'.$morecss.'"' : '');
-			}
+            $classfortooltip = 'classfortooltip';
+            $dataparams = '';
+            $label = '';
+            if (getDolGlobalInt('MAIN_ENABLE_AJAX_TOOLTIP')) {
+                $classfortooltip = 'classforajaxtooltip';
+                $dataparams = ' data-params="'.dol_escape_htmltag(json_encode($params)).'"';
+            } else {
+                $label = implode($this->getTooltipContentArray($params));
+            }
+
+            $linkclose = '';
+            if (empty($notooltip)) {
+                if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+                    $label = $langs->trans("ShowMo");
+                    $linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+                }
+                $linkclose .= (!empty($label) ? ' title="'.dol_escape_htmltag($label, 1).'"' :  ' title="tocomplete"');
+                $linkclose .= $dataparams.' class="'.$classfortooltip.($morecss ? ' '.$morecss : '').'"';
+            } else {
+                $linkclose = ($morecss ? ' class="'.$morecss.'"' : '');
+            }
 
 			$linkstart = '<a href="'.$url.'"';
 			$linkstart .= $linkclose.'>';
@@ -325,6 +350,8 @@ class MoPickingLine extends CommonObject
 		if (isset($extrafields->attributes[$object->table_element]['label']) && is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) {
 			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 		}
+
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product AS tp ON t.fk_product = tp.rowid"; // Target Product Join
 
 		$sqlConsumed = "SELECT fk_mrp_production, SUM(qty) AS qty_consumed";
 		$sqlConsumed .= " FROM ".MAIN_DB_PREFIX."mrp_production";
