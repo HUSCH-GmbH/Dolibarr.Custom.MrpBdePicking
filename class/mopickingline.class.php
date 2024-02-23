@@ -327,6 +327,8 @@ class MoPickingLine extends CommonObject
 			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 		}
 
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product AS tp ON t.fk_product = tp.rowid"; // Target Product Join
+
 		$sqlConsumed = "SELECT fk_mrp_production, SUM(qty) AS qty_consumed";
 		$sqlConsumed .= " FROM ".MAIN_DB_PREFIX."mrp_production";
 		$sqlConsumed .= " WHERE role = 'consumed'";
