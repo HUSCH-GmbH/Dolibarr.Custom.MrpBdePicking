@@ -113,6 +113,7 @@ class MoBde extends CommonObject
 		'date_start_planned' => array('type'=>'datetime', 'label'=>'DateStartPlannedMo', 'enabled'=>1, 'visible'=>1, 'position'=>55, 'notnull'=>-1, 'index'=>1, 'help'=>'KeepEmptyForAsap', 'alwayseditable'=>1),
 		'date_end_planned' => array('type'=>'datetime', 'label'=>'DateEndPlannedMo', 'enabled'=>1, 'visible'=>1, 'position'=>56, 'notnull'=>-1, 'index'=>1, 'alwayseditable'=>1),
         'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>1000, 'notnull'=>-1,),
+		'status_todo' => array('sqlSelect'=>'IFNULL(xl.status_todo,0) AS status_todo', 'type'=>'integer', 'label'=>'statusTodo', 'enabled'=>1, 'visible'=>1, 'position'=>1010, 'default'=>0, 'notnull'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'None', '1'=>'PickingAvalible', '2'=>'CanProduce')),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>1, 'visible'=>2, 'position'=>1000, 'default'=>0, 'notnull'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Draft', '1'=>'Validated', '2'=>'InProgress', '3'=>'StatusMOProduced', '9'=>'Canceled')),
 	);
 	public $rowid;
@@ -145,7 +146,10 @@ class MoBde extends CommonObject
 	public $date_valid;
 
 	public $import_key;
+
 	public $status;
+	public $status_todo;
+	public $status_has_error;
 
 	/**
 	 * @var int ID of product
