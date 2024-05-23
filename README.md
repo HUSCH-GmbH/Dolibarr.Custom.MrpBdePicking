@@ -3,7 +3,7 @@
 ## Features
 
 ### Picking list
-The picking list is displayed under *MRP => Picking list*.
+The picking list is displayed under *MRP => Picking list*. Test.
 
 ![Screenshot mrpbdepicking](img/screenshot_mrpbdepicking.png?raw=true)
 
