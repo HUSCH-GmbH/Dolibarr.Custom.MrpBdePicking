@@ -91,6 +91,7 @@ class MrpBdePicking extends DolibarrApi
 
 
         $sqlForPickableMoLines = $this->CreateMoPickingLinesSqlStatement();
+        $sqlForProduceableMoLines = $this->CreateMoProduceableLinesSqlStatement();
 
         // Definition of array of fields for columns
         $selects = $this->getArrOfSqlSelects($tmpobject);
@@ -103,14 +104,16 @@ class MrpBdePicking extends DolibarrApi
         $sql .= " FROM " . MAIN_DB_PREFIX . $tmpobject->table_element . " AS t LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . "_extrafields AS ef ON (ef.fk_object = t.rowid)"; // Modification VMR Global Solutions to include extrafields as search parameters in the API GET call, so we will be able to filter on extrafields
         $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON t.fk_product = p.rowid";
 
-        //Integration status_todo
-        $sql .= " LEFT JOIN (SELECT X.rowid, 1 as status_todo FROM (";
+        //Integration status_can_picking
+        $sql .= " LEFT JOIN (SELECT X.rowid, 1 as status_can_picking FROM (";
         $sql .= " " . $sqlForPickableMoLines;
         $sql .= " ) X GROUP BY X.rowid) xl ON xl.rowid = t.rowid";
 
-        if ($restrictonsocid && (!DolibarrApiAccess::$user->rights->societe->client->voir && !$socid) || $search_sale > 0) {
-            $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc"; // We need this table joined to the select in order to filter by sale
-        }
+//        //Integration status_can_produce
+//        $sql .= " LEFT JOIN (SELECT Y.rowid, 1 as status_can_produce FROM (";
+//        $sql .= " " . $sqlForProduceableMoLines;
+//        $sql .= " ) Y GROUP BY Y.rowid) yl ON yl.rowid = t.rowid";
+
         $sql .= " WHERE 1 = 1";
 
         // Example of use $mode
@@ -336,7 +339,6 @@ class MrpBdePicking extends DolibarrApi
         return $object;
     }
 
-
     private function CreateMoPickingLinesSqlStatement()
     {
         $tmpobject = new MoPickingLine($this->db);
@@ -367,7 +369,44 @@ class MrpBdePicking extends DolibarrApi
 
         $sql .= " LEFT JOIN (" . $sqlConsumed . ") as tChild ON l.rowid = tChild.fk_mrp_production";
         $sql .= " WHERE 1 = 1";
-        $sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume' AND p.fk_product_type = 0 AND p.stock > 0";
+        //$sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume' AND p.fk_product_type = 0 AND p.stock > 0";
+        $sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume' AND p.stock > 0";
+        $sql .= " HAVING qtytoconsum > 0";
+
+        return $sql;
+    }
+
+    private function CreateMoProduceableLinesSqlStatement()
+    {
+        $tmpobject = new MoPickingLine($this->db);
+        $extrafields = new ExtraFields($this->db);
+
+        // Fetch optionals attributes and labels
+        $extrafields->fetch_name_optionals_label($tmpobject->table_element);
+
+        // Definition of array of fields for columns
+        $selects = $this->getArrOfSqlSelects($tmpobject);
+
+
+        $sql = 'SELECT t.rowid,t.entity,';
+        $sql .= implode(',', $selects);
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_stock as s";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON s.fk_product = p.rowid"; // Consum Product Join
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "mrp_production as l ON p.rowid = l.fk_product";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . " as t ON l.fk_mo = t.rowid";
+        if (isset($extrafields->attributes[$tmpobject->table_element]['label']) && is_array($extrafields->attributes[$tmpobject->table_element]['label']) && count($extrafields->attributes[$tmpobject->table_element]['label'])) {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+        }
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product AS tp ON t.fk_product = tp.rowid"; // Target Product Join
+
+        $sqlConsumed = "SELECT fk_mrp_production, SUM(qty) AS qty_consumed";
+        $sqlConsumed .= " FROM " . MAIN_DB_PREFIX . "mrp_production";
+        $sqlConsumed .= " WHERE role = 'consumed'";
+        $sqlConsumed .= " GROUP BY fk_mrp_production";
+
+        $sql .= " LEFT JOIN (" . $sqlConsumed . ") as tChild ON l.rowid = tChild.fk_mrp_production";
+        $sql .= " WHERE 1 = 1";
+        $sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume' AND p.stock > 0";
         $sql .= " HAVING qtytoconsum > 0";
 
         return $sql;
