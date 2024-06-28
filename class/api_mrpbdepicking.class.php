@@ -88,10 +88,8 @@ class MrpBdePicking extends DolibarrApi
 
         // Build and execute select
         // --------------------------------------------------------------------
-
-
         $sqlForPickableMoLines = $this->CreateMoPickingLinesSqlStatement();
-        $sqlForProduceableMoLines = $this->CreateMoProduceableLinesSqlStatement();
+        $sqlForProduceableMos = $this->CreateProduceableMosSqlStatement();
 
         // Definition of array of fields for columns
         $selects = $this->getArrOfSqlSelects($tmpobject);
@@ -109,10 +107,10 @@ class MrpBdePicking extends DolibarrApi
         $sql .= " " . $sqlForPickableMoLines;
         $sql .= " ) X GROUP BY X.rowid) xl ON xl.rowid = t.rowid";
 
-//        //Integration status_can_produce
-//        $sql .= " LEFT JOIN (SELECT Y.rowid, 1 as status_can_produce FROM (";
-//        $sql .= " " . $sqlForProduceableMoLines;
-//        $sql .= " ) Y GROUP BY Y.rowid) yl ON yl.rowid = t.rowid";
+        //Integration status_can_produce
+        $sql .= " LEFT JOIN (";
+        $sql .= " " . $sqlForProduceableMos;
+        $sql .= " ) AS Y ON Y.fk_mo = t.rowid";
 
         $sql .= " WHERE 1 = 1";
 
@@ -376,38 +374,31 @@ class MrpBdePicking extends DolibarrApi
         return $sql;
     }
 
-    private function CreateMoProduceableLinesSqlStatement()
+    private function CreateProduceableMosSqlStatement()
     {
-        $tmpobject = new MoPickingLine($this->db);
-        $extrafields = new ExtraFields($this->db);
+        $sql = "SELECT result.fk_mo, IF(SUM(result.incomplete) > 0, 0, 1) AS status_can_produce";
+        $sql .= " FROM (";
 
-        // Fetch optionals attributes and labels
-        $extrafields->fetch_name_optionals_label($tmpobject->table_element);
+        $sql .= " SELECT pickingcomplete.fk_mo, SUM(pickingcomplete.incomplete) AS incomplete";
+        $sql .= " FROM (";
 
-        // Definition of array of fields for columns
-        $selects = $this->getArrOfSqlSelects($tmpobject);
+        $sql .= " SELECT pl.rowid, pl.fk_mo, pl.role, pl.disable_stock_change, pl.qty, IFNULL(consumed.qty_consumed,0) AS qty_consumed, IF(pl.qty-qty_consumed <= 0, 0, 1) AS incomplete";
+        $sql .= " FROM llx_mrp_production pl";
+        $sql .= " LEFT JOIN (";
+        $sql .= " SELECT consumed.fk_mrp_production, SUM(consumed.qty) AS qty_consumed";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "mrp_production consumed";
+        $sql .= " WHERE role = 'consumed'";
+        $sql .= " GROUP BY consumed.fk_mrp_production) AS consumed ON consumed.fk_mrp_production = pl.rowid";
+
+        $sql .= " ) AS pickingcomplete";
+        $sql .= " WHERE pickingcomplete.role = 'toconsume' AND pickingcomplete.disable_stock_change != 1";
+        $sql .= " GROUP BY pickingcomplete.rowid";
 
 
-        $sql = 'SELECT t.rowid,t.entity,';
-        $sql .= implode(',', $selects);
-        $sql .= " FROM " . MAIN_DB_PREFIX . "product_stock as s";
-        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON s.fk_product = p.rowid"; // Consum Product Join
-        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "mrp_production as l ON p.rowid = l.fk_product";
-        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . " as t ON l.fk_mo = t.rowid";
-        if (isset($extrafields->attributes[$tmpobject->table_element]['label']) && is_array($extrafields->attributes[$tmpobject->table_element]['label']) && count($extrafields->attributes[$tmpobject->table_element]['label'])) {
-            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-        }
-        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product AS tp ON t.fk_product = tp.rowid"; // Target Product Join
-
-        $sqlConsumed = "SELECT fk_mrp_production, SUM(qty) AS qty_consumed";
-        $sqlConsumed .= " FROM " . MAIN_DB_PREFIX . "mrp_production";
-        $sqlConsumed .= " WHERE role = 'consumed'";
-        $sqlConsumed .= " GROUP BY fk_mrp_production";
-
-        $sql .= " LEFT JOIN (" . $sqlConsumed . ") as tChild ON l.rowid = tChild.fk_mrp_production";
-        $sql .= " WHERE 1 = 1";
-        $sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume' AND p.stock > 0";
-        $sql .= " HAVING qtytoconsum > 0";
+        $sql .= " ) AS result";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "mrp_mo AS mo ON mo.rowid = result.fk_mo";
+        $sql .= " WHERE mo.`status` IN (1,2)";
+        $sql .= " GROUP BY result.fk_mo";
 
         return $sql;
     }
