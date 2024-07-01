@@ -211,14 +211,15 @@ class MrpBdePicking extends DolibarrApi
 
         // Build and execute select
         // --------------------------------------------------------------------
-        $sql = $this->CreateMoPickingLinesSqlStatement();
 
-        // Example of use $mode
-        //if ($mode == 1) $sql.= " AND s.client IN (1, 3)";
-        //if ($mode == 2) $sql.= " AND s.client IN (2, 3)";
+        $sql = "SELECT * FROM (";
+        $sql .= " " . $this->CreateMoPickingLinesSqlStatement();
+        $sql .= " ) AS t";
+        $sql .= " WHERE 1 = 1";
+
 
         if ($tmpobject->ismultientitymanaged) {
-            $sql .= ' AND t.entity IN (' . getEntity($tmpobject->element) . ')';
+            $sql .= " AND t.entity IN (" . getEntity($tmpobject->element) . ")";
         }
         if ($restrictonsocid && (!DolibarrApiAccess::$user->rights->societe->client->voir && !$socid) || $search_sale > 0) {
             $sql .= " AND t.fk_soc = sc.fk_soc";
@@ -233,13 +234,13 @@ class MrpBdePicking extends DolibarrApi
         if ($restrictonsocid && $search_sale > 0) {
             $sql .= " AND sc.fk_user = " . ((int)$search_sale);
         }
+
         if ($sqlfilters) {
             $errormessage = '';
-            if (!DolibarrApi::_checkFilters($sqlfilters, $errormessage)) {
-                throw new RestException(503, 'Error when validating parameter sqlfilters -> ' . $errormessage);
+            $sql .= forgeSQLFromUniversalSearchCriteria($sqlfilters, $errormessage);
+            if ($errormessage) {
+                throw new RestException(400, 'Error when validating parameter sqlfilters -> '.$errormessage);
             }
-            $regexstring = '\(([^:\'\(\)]+:[^:\'\(\)]+:[^\(\)]+)\)';
-            $sql .= " AND (" . preg_replace_callback('/' . $regexstring . '/', 'DolibarrApi::_forge_criteria_callback', $sqlfilters) . ")";
         }
 
         $sql .= $this->db->order($sortfield, $sortorder);
