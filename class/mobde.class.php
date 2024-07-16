@@ -64,7 +64,6 @@ class MoBde extends CommonObject
 	const STATUS_PRODUCED = 3;
 	const STATUS_CANCELED = 9;
 
-
 	/**
 	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
 	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
@@ -113,6 +112,8 @@ class MoBde extends CommonObject
 		'date_start_planned' => array('type'=>'datetime', 'label'=>'DateStartPlannedMo', 'enabled'=>1, 'visible'=>1, 'position'=>55, 'notnull'=>-1, 'index'=>1, 'help'=>'KeepEmptyForAsap', 'alwayseditable'=>1),
 		'date_end_planned' => array('type'=>'datetime', 'label'=>'DateEndPlannedMo', 'enabled'=>1, 'visible'=>1, 'position'=>56, 'notnull'=>-1, 'index'=>1, 'alwayseditable'=>1),
         'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>1000, 'notnull'=>-1,),
+		'status_can_picking' => array('sqlSelect'=>'IFNULL(xl.status_can_picking,0) AS status_can_picking', 'type'=>'integer', 'label'=>'StatusCanPicking', 'enabled'=>1, 'visible'=>1, 'position'=>1010, 'default'=>0, 'notnull'=>1, 'index'=>1),
+		'status_can_produce' => array('sqlSelect'=>'IFNULL(Y.status_can_produce, 0) AS status_can_produce', 'type'=>'integer', 'label'=>'CanProduce', 'enabled'=>1, 'visible'=>1, 'position'=>1010, 'default'=>0, 'notnull'=>1, 'index'=>1),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>1, 'visible'=>2, 'position'=>1000, 'default'=>0, 'notnull'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Draft', '1'=>'Validated', '2'=>'InProgress', '3'=>'StatusMOProduced', '9'=>'Canceled')),
 	);
 	public $rowid;
@@ -145,7 +146,20 @@ class MoBde extends CommonObject
 	public $date_valid;
 
 	public $import_key;
+
 	public $status;
+
+    /**
+     * @var bool status_can_picking;
+     */
+	public $status_can_picking;
+
+    /**
+     * @var bool status_can_produce;
+     */
+	public $status_can_produce;
+
+	public $status_has_error;
 
 	/**
 	 * @var int ID of product
@@ -166,7 +180,6 @@ class MoBde extends CommonObject
 	 * @var integer|string date_end_planned
 	 */
 	public $date_end_planned;
-
 
 	/**
 	 * @var int ID bom
