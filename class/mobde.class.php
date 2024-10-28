@@ -100,11 +100,13 @@ class MoBde extends CommonObject
 		'fk_bom' => array('type'=>'integer:Bom:bom/class/bom.class.php:0:(t.status:=:1)', 'filter'=>'active=1', 'label'=>'BOM', 'enabled'=>'$conf->bom->enabled', 'visible'=>1, 'position'=>33, 'notnull'=>-1, 'index'=>1, 'comment'=>"Original BOM", 'css'=>'minwidth100 maxwidth500', 'csslist'=>'tdoverflowmax150', 'picto'=>'bom'),
 		'mrptype' => array('type'=>'integer', 'label'=>'Type', 'enabled'=>1, 'visible'=>1, 'position'=>34, 'notnull'=>1, 'default'=>'0', 'arrayofkeyval'=>array(0=>'Manufacturing', 1=>'Disassemble'), 'css'=>'minwidth150', 'csslist'=>'minwidth150 center'),
 		'fk_product' => array('type'=>'integer:Product:product/class/product.class.php:0', 'label'=>'Product', 'enabled'=>'isModEnabled("product")', 'visible'=>1, 'position'=>35, 'notnull'=>1, 'index'=>1, 'comment'=>"Product to produce", 'css'=>'maxwidth300', 'csslist'=>'tdoverflowmax100', 'picto'=>'product'),
-		'fk_product_ref' => array('sqlSelect'=>'p.ref AS fk_product_ref', 'type'=>'varchar(128)', 'label'=>'ProductRef', 'enabled'=>'isModEnabled("product")', 'visible'=>1, 'position'=>35, 'notnull'=>1, 'index'=>1, 'comment'=>"Ref of Product to produce", 'css'=>'maxwidth300', 'csslist'=>'tdoverflowmax100', 'picto'=>'product'),
+		'fk_product_ref' => array('sqlSelect'=>'p.ref AS fk_product_ref', 'type'=>'varchar(128)', 'label'=>'ProductRef', 'enabled'=>'isModEnabled("product")', 'visible'=>1, 'position'=>35, 'notnull'=>1, 'index'=>1, 'comment'=>"Ref of Product to produce", 'css'=>'maxwidth300', 'csslist'=>'tdoverflowmax100'),
 		'qty' => array('type'=>'real', 'label'=>'QtyToProduce', 'enabled'=>1, 'visible'=>1, 'position'=>40, 'notnull'=>1, 'comment'=>"Qty to produce", 'css'=>'width75', 'default'=>1, 'isameasure'=>1),
         'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>1, 'visible'=>1, 'position'=>42, 'notnull'=>-1, 'searchall'=>1, 'showoncombobox'=>'2', 'css'=>'maxwidth300', 'csslist'=>'tdoverflowmax200', 'alwayseditable'=>1),
         'fk_soc' => array('type'=>'integer:Societe:societe/class/societe.class.php:1', 'label'=>'ThirdParty', 'picto'=>'company', 'enabled'=>'isModEnabled("societe")', 'visible'=>-1, 'position'=>50, 'notnull'=>-1, 'index'=>1, 'css'=>'maxwidth400', 'csslist'=>'tdoverflowmax150'),
-		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1:(fk_statut:=:1)', 'label'=>'Project', 'picto'=>'project', 'enabled'=>'$conf->project->enabled', 'visible'=>-1, 'position'=>51, 'notnull'=>-1, 'index'=>1, 'css'=>'minwidth200 maxwidth400', 'csslist'=>'tdoverflowmax100'),
+		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1:(fk_statut:=:1)', 'label'=>'Project', 'picto'=>'project', 'enabled'=>'isModEnabled("project")', 'visible'=>-1, 'position'=>51, 'notnull'=>-1, 'index'=>1, 'css'=>'minwidth200 maxwidth400', 'csslist'=>'tdoverflowmax100', 'picto'=>'project'),
+        'fk_project_ref' => array('sqlSelect'=>'Y.ref AS fk_project_ref', 'type'=>'varchar(128)', 'label'=>'ProjectRef', 'enabled'=>'isModEnabled("project")', 'visible'=>1, 'position'=>52, 'notnull'=>1, 'index'=>1, 'comment'=>"Ref of project", 'css'=>'maxwidth300', 'csslist'=>'tdoverflowmax100'),
+        'fk_project_title' => array('sqlSelect'=>'Y.title AS fk_project_title', 'type'=>'varchar(256)', 'label'=>'ProjectTitle', 'enabled'=>'isModEnabled("project")', 'visible'=>1, 'position'=>52, 'notnull'=>1, 'index'=>1, 'comment'=>"Title of project", 'css'=>'maxwidth300', 'csslist'=>'tdoverflowmax100'),
 		'fk_warehouse' => array('type'=>'integer:Entrepot:product/stock/class/entrepot.class.php:0', 'label'=>'WarehouseForProduction', 'picto'=>'stock', 'enabled'=>'isModEnabled("stock")', 'visible'=>1, 'position'=>52, 'css'=>'maxwidth400', 'csslist'=>'tdoverflowmax200'),
         'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>61, 'notnull'=>-1,),
         'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>62, 'notnull'=>-1,),
@@ -195,6 +197,16 @@ class MoBde extends CommonObject
 	 * @var int ID project
 	 */
 	public $fk_project;
+
+    /**
+     * @var string Ref of project
+     */
+    public $fk_project_ref;
+
+    /**
+     * @var string Title of project
+     */
+    public $fk_project_title;
 
 	/**
 	 * @var string    Field with ID of parent key if this field has a parent
