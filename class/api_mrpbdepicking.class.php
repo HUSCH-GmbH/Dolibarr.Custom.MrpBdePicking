@@ -18,6 +18,7 @@
 use Luracast\Restler\RestException;
 
 require_once DOL_DOCUMENT_ROOT . '/mrp/class/mo.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/custom/mrpbdepicking/class/mobde.class.php';
 require_once DOL_DOCUMENT_ROOT . '/custom/mrpbdepicking/class/mopickingline.class.php';
 
@@ -71,6 +72,7 @@ class MrpBdePicking extends DolibarrApi
 
         $obj_ret = array();
         $tmpobject = new MoBde($this->db);
+        $tmpProject = new Project($this->db);
         $extrafields = new ExtraFields($this->db);
 
         // Fetch optionals attributes and labels
@@ -101,6 +103,9 @@ class MrpBdePicking extends DolibarrApi
         }
         $sql .= " FROM " . MAIN_DB_PREFIX . $tmpobject->table_element . " AS t LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . "_extrafields AS ef ON (ef.fk_object = t.rowid)"; // Modification VMR Global Solutions to include extrafields as search parameters in the API GET call, so we will be able to filter on extrafields
         $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON t.fk_product = p.rowid";
+
+        //Integration Project Infos
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpProject->table_element . " AS Y ON t.fk_project = Y.rowid";
 
         //Integration status_can_picking
         $sql .= " LEFT JOIN (SELECT X.rowid, 1 as status_can_picking FROM (";
