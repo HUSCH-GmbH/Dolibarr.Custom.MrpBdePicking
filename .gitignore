@@ -19,3 +19,5 @@
 *.back
 /.editorconfig
 /.gitattributes
+# HUSCH custom numbering modules (bind-mounted via DolibarrContainer, not part of this module)
+/mod_codeproduct_husch_*.php
