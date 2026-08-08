@@ -7,10 +7,12 @@ applyTo: "**/*.php"
 # MrpBdePicking Implementierungsrichtlinien
 
 Diese Regeln ergänzen die zentralen Richtlinien aus `../../../../../.github/instructions/php-dolibarr.instructions.md`.
+Sie stellen ausschließlich modul-spezifische Ergänzungen dar und dürfen `AGENTS.md`, `Dolibarr.instructions.md` und `DolibarrDocker.instructions.md` nicht aufheben.
 
 ## Modul-Schwerpunkte
 - Fokus auf Picklistenfunktionen, MRP-Integration und API-Endpunkte.
 - Bestehende Modulobjekte und etablierte API-Muster bevorzugen.
+- Bei Unsicherheit oder mehreren validen Umsetzungswegen vor Implementierung Rueckfrage stellen.
 
 ## API-Verhalten
 - Antworten konsistent und vorhersehbar halten (Status, Fehlermeldungen, Datenstruktur).
