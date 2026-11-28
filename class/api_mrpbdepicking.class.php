@@ -189,11 +189,12 @@ class MrpBdePicking extends DolibarrApi
      * @param int $limit Limit for list
      * @param int $page Page number
      * @param string $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
+    * @param int $includeWithoutStock Set to 1 to include open consumption lines without positive warehouse stock, even if no warehouse stock record exists
      * @return  array                               Array of order objects
      *
      * @throws RestException
      */
-    public function getMoPickingLines($sortfield = "t.rowid", $sortorder = 'ASC', $limit = 100, $page = 0, $sqlfilters = '')
+    public function getMoPickingLines($sortfield = "t.rowid", $sortorder = 'ASC', $limit = 100, $page = 0, $sqlfilters = '', $includeWithoutStock = 0)
     {
         global $conf;
 
@@ -218,7 +219,7 @@ class MrpBdePicking extends DolibarrApi
         // --------------------------------------------------------------------
 
         $sql = "SELECT * FROM (";
-        $sql .= " " . $this->CreateMoPickingLinesSqlStatement();
+        $sql .= " " . $this->CreateMoPickingLinesSqlStatement($includeWithoutStock);
         $sql .= " ) AS t";
         $sql .= " WHERE 1 = 1";
 
@@ -343,7 +344,7 @@ class MrpBdePicking extends DolibarrApi
         return $object;
     }
 
-    private function CreateMoPickingLinesSqlStatement()
+    private function CreateMoPickingLinesSqlStatement($includeWithoutStock = 0)
     {
         $tmpobject = new MoPickingLine($this->db);
         $extrafields = new ExtraFields($this->db);
@@ -357,9 +358,9 @@ class MrpBdePicking extends DolibarrApi
 
         $sql = 'SELECT t.rowid,t.entity,';
         $sql .= implode(',', $selects);
-        $sql .= " FROM " . MAIN_DB_PREFIX . "product_stock as s";
-        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON s.fk_product = p.rowid"; // Consum Product Join
-        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "mrp_production as l ON p.rowid = l.fk_product";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "mrp_production as l";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product as p ON p.rowid = l.fk_product";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_stock as s ON s.fk_product = p.rowid";
         $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . " as t ON l.fk_mo = t.rowid";
         if (isset($extrafields->attributes[$tmpobject->table_element]['label']) && is_array($extrafields->attributes[$tmpobject->table_element]['label']) && count($extrafields->attributes[$tmpobject->table_element]['label'])) {
             $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $tmpobject->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
@@ -373,8 +374,10 @@ class MrpBdePicking extends DolibarrApi
 
         $sql .= " LEFT JOIN (" . $sqlConsumed . ") as tChild ON l.rowid = tChild.fk_mrp_production";
         $sql .= " WHERE 1 = 1";
-        //$sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume' AND p.fk_product_type = 0 AND p.stock > 0";
-        $sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume' AND p.stock > 0";
+        $sql .= " AND t.status IN (1,2,3) AND l.role = 'toconsume'";
+        if (!$includeWithoutStock) {
+            $sql .= " AND s.reel > 0";
+        }
         $sql .= " HAVING qtytoconsum > 0";
 
         return $sql;
